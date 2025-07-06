@@ -1,0 +1,52 @@
+<div class="h-screen flex items-center justify-center bg-gray-100">
+  <form
+    [formGroup]="form"
+    (ngSubmit)="login()"
+    class="bg-white p-6 rounded-lg shadow max-w-sm space-y-5 w-1/3 items-center justify-center"
+  >
+    <h2 class="text-xl font-semibold text-center text-gray-700">
+      Iniciar sesión
+    </h2>
+
+    <div>
+      <label class="block mb-1 text-sm text-gray-600">Documento</label>
+      <p-inputnumber
+        inputId="integeronly"
+        formControlName="idEstudiante"
+        useGrouping="false"
+        [maxlength]="9"
+        class="w-full"
+      />
+    </div>
+
+    <div>
+      <label class="block mb-1 text-sm text-gray-600">Clave</label>
+      <p-password
+        formControlName="clave"
+        [feedback]="false"
+        styleClass="w-full"
+        inputStyleClass="w-full"
+      />
+    </div>
+
+    <button
+      pButton
+      type="submit"
+      label="Ingresar"
+      [disabled]="form.invalid || cargando"
+      class="w-full"
+    ></button>
+
+    <div class="text-center">
+      <p class="text-sm text-gray-600">
+        ¿No tienes cuenta?
+        <a
+          routerLink="/registro"
+          class="text-blue-600 hover:text-blue-800 font-medium"
+        >
+          Regístrate aquí
+        </a>
+      </p>
+    </div>
+  </form>
+</div>

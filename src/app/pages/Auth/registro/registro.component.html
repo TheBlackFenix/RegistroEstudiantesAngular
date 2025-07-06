@@ -1,0 +1,124 @@
+<div class="h-screen flex items-center justify-center bg-gray-100">
+  <form
+    [formGroup]="form"
+    (ngSubmit)="registrar()"
+    class="bg-white p-6 rounded-lg shadow max-w-sm space-y-5 w-1/3 items-center justify-center"
+  >
+    <h2 class="text-xl font-semibold text-center text-gray-700">
+      Registro de Estudiante
+    </h2>
+
+    <div>
+      <label class="block mb-1 text-sm text-gray-600">Documento</label>
+      <p-inputnumber
+        inputId="integeronly"
+        formControlName="idEstudiante"
+        useGrouping="false"
+        [maxlength]="9"
+        class="w-full"
+        [class.ng-invalid]="
+          form.get('idEstudiante')?.invalid && form.get('idEstudiante')?.touched
+        "
+      />
+      @if (form.get('idEstudiante')?.invalid &&
+      form.get('idEstudiante')?.touched) {
+      <small class="text-red-500 text-xs mt-1 block">
+        @if (form.get('idEstudiante')?.hasError('required')) { El documento es
+        requerido } @if (form.get('idEstudiante')?.hasError('min')) { El
+        documento debe ser mayor a 0 }
+      </small>
+      }
+    </div>
+
+    <div>
+      <label class="block mb-1 text-sm text-gray-600">Nombre Estudiante</label>
+      <input
+        type="text"
+        pInputText
+        class="w-full"
+        formControlName="nombreEstudiante"
+        [class.ng-invalid]="
+          form.get('nombreEstudiante')?.invalid &&
+          form.get('nombreEstudiante')?.touched
+        "
+      />
+      @if (form.get('nombreEstudiante')?.invalid &&
+      form.get('nombreEstudiante')?.touched) {
+      <small class="text-red-500 text-xs mt-1 block">
+        @if (form.get('nombreEstudiante')?.hasError('required')) { El nombre es
+        requerido } @if (form.get('nombreEstudiante')?.hasError('minlength')) {
+        El nombre debe tener al menos 3 caracteres }
+      </small>
+      }
+    </div>
+
+    <div>
+      <label class="block mb-1 text-sm text-gray-600">Contraseña</label>
+      <p-password
+        formControlName="clave"
+        [feedback]="false"
+        styleClass="w-full"
+        inputStyleClass="w-full"
+        [class.ng-invalid]="
+          form.get('clave')?.invalid && form.get('clave')?.touched
+        "
+      />
+      @if (form.get('clave')?.invalid && form.get('clave')?.touched) {
+      <small class="text-red-500 text-xs mt-1 block">
+        @if (form.get('clave')?.hasError('required')) { La contraseña es
+        requerida } @if (form.get('clave')?.hasError('minlength')) { La
+        contraseña debe tener al menos 6 caracteres }
+      </small>
+      }
+    </div>
+
+    <div>
+      <label class="block mb-1 text-sm text-gray-600"
+        >Confirmar Contraseña</label
+      >
+      <p-password
+        formControlName="confirmaClave"
+        [feedback]="false"
+        styleClass="w-full"
+        inputStyleClass="w-full"
+        [class.ng-invalid]="
+          (form.get('confirmaClave')?.invalid &&
+            form.get('confirmaClave')?.touched) ||
+          passwordMismatch
+        "
+      />
+      @if (form.get('confirmaClave')?.invalid &&
+      form.get('confirmaClave')?.touched) {
+      <small class="text-red-500 text-xs mt-1 block">
+        @if (form.get('confirmaClave')?.hasError('required')) { La confirmación
+        de contraseña es requerida }
+      </small>
+      } @if (passwordMismatch) {
+      <small class="text-red-500 text-xs mt-1 block">
+        Las contraseñas no coinciden
+      </small>
+      }
+    </div>
+
+    <button
+      pButton
+      type="submit"
+      label="Registrarse"
+      [disabled]="form.invalid || cargando"
+      [loading]="cargando"
+      class="w-full"
+    ></button>
+
+    <div class="text-center">
+      <p class="text-sm text-gray-600">
+        ¿Ya tienes cuenta?
+        <a
+          routerLink="/login"
+          class="text-blue-600 hover:text-blue-800 font-medium"
+        >
+          Inicia sesión aquí
+        </a>
+      </p>
+    </div>
+  </form>
+</div>
