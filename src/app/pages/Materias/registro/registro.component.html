@@ -21,6 +21,7 @@
     [paginator]="true"
     [rows]="10"
     [responsive]="true"
+    [loading]="cargando"
   >
     <ng-template pTemplate="header">
       <tr>
@@ -35,9 +36,7 @@
         <td>
           <p-checkbox
             [ngModel]="esMateriaSeleccionada(materia.idMateria)"
-            (ngModelChange)="
-              onMateriaSeleccionada(materia, { checked: $event })
-            "
+            (ngModelChange)="onMateriaSeleccionada(materia, $event)"
             [disabled]="esMateriaDeshabilitada(materia)"
             [binary]="true"
           >
@@ -66,7 +65,8 @@
     <p-button
       label="Registrar Materias"
       icon="pi pi-check"
-      [disabled]="materiasSeleccionadas.length === 0"
+      [disabled]="materiasSeleccionadas.length === 0 || cargando"
+      [loading]="cargando"
       (onClick)="registrarMaterias()"
       severity="success"
     >

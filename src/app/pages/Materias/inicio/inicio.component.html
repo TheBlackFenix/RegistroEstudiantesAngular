@@ -1,13 +1,15 @@
 <div class="w-full h-full flex flex-col items-center justify-center">
   <p-menubar [model]="items" class="w-full" />
-  <div class="w-full flex flex-col gap-2 m-4">
-    @if (materiasInsritas) {
-    <h1>Materias Inscritas</h1>
-    <div class="w-full flex flex-row flex-wrap gap-2 items-center justify-left">
-      @for (materia of materiasInsritas; track materia.idMateria) {
-      <p-message severity="info" [text]="materia.nombreMateria" />
-      }
-    </div>
+  <div class="w-full flex flex-col gap-2 m-4 p-4">
+    @if (materiasInscritas.length > 0) {
+      <h1>Materias Inscritas</h1>
+      <div
+        class="w-full flex flex-row flex-wrap gap-2 items-center justify-left"
+      >
+        @for (materia of materiasInscritas; track materia.idMateria) {
+          <p-message severity="info" [text]="materia.nombreMateria" />
+        }
+      </div>
     }
   </div>
   <router-outlet />

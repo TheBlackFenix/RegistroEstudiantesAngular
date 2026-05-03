@@ -14,6 +14,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { PasswordModule } from 'primeng/password';
 import { InputTextModule } from 'primeng/inputtext';
 import { CommonModule } from '@angular/common';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-registro',
@@ -91,26 +92,27 @@ export default class RegistroComponent {
       claveAcceso: this.form.value.clave!,
     };
 
-    this.auth.registro(registroDto).subscribe({
-      next: (res: { message: string }) => {
-        this.cargando = false;
-        this.toastService.showMessage(
-          'success',
-          3000,
-          'Éxito',
-          'Registro exitoso'
-        );
-        this.router.navigate(['/login']);
-      },
-      error: () => {
-        this.cargando = false;
-        this.toastService.showMessage(
-          'error',
-          3000,
-          'Error',
-          'Error en el registro, intente nuevamente'
-        );
-      },
-    });
+    this.auth
+      .registro(registroDto)
+      .pipe(finalize(() => (this.cargando = false)))
+      .subscribe({
+        next: () => {
+          this.toastService.showMessage(
+            'success',
+            3000,
+            'Éxito',
+            'Registro exitoso'
+          );
+          this.router.navigate(['/login']);
+        },
+        error: () => {
+          this.toastService.showMessage(
+            'error',
+            3000,
+            'Error',
+            'Error en el registro, intente nuevamente'
+          );
+        },
+      });
   }
 }

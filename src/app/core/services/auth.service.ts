@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
+import { environment } from '../../../environments/environment';
 import { DecodedToken, LoginDto, RegistroDto } from '../models/auth';
 
 @Injectable({
@@ -9,7 +10,7 @@ import { DecodedToken, LoginDto, RegistroDto } from '../models/auth';
 })
 export class AuthService {
   private readonly tokenKey = 'token';
-  private readonly apiUrl = 'https://localhost:7230/api';
+  private readonly apiUrl = environment.apiUrl;
   public readonly isAuthenticated = computed(() => this._isAuthenticated());
   private http = inject(HttpClient);
   private router = inject(Router);
@@ -18,20 +19,19 @@ export class AuthService {
   login(dto: LoginDto) {
     return this.http.post<{ token: string }>(
       `${this.apiUrl}/Autenticacion/login`,
-      dto
+      dto,
     );
   }
 
   registro(dto: RegistroDto) {
     return this.http.post<{ message: string }>(
       `${this.apiUrl}/Autenticacion/registro`,
-      dto
+      dto,
     );
   }
 
   logout() {
-    localStorage.removeItem(this.tokenKey);
-    this._isAuthenticated.set(false);
+    this.limpiarSesion();
     this.router.navigate(['/login']);
   }
 
@@ -45,7 +45,19 @@ export class AuthService {
   }
 
   get usuario(): DecodedToken | null {
-    const token = this.token;
+    return this.decodificarToken(this.token);
+  }
+
+  tieneSesionValida(): boolean {
+    return this.tieneTokenValido();
+  }
+
+  limpiarSesion(): void {
+    localStorage.removeItem(this.tokenKey);
+    this._isAuthenticated.set(false);
+  }
+
+  private decodificarToken(token: string | null): DecodedToken | null {
     if (!token) return null;
 
     try {
@@ -56,15 +68,8 @@ export class AuthService {
   }
 
   private tieneTokenValido(): boolean {
-    const token = localStorage.getItem(this.tokenKey);
-    if (!token) return false;
-
-    try {
-      const decoded: DecodedToken = jwtDecode(token);
-      const ahora = Math.floor(Date.now() / 1000);
-      return decoded.exp > ahora;
-    } catch {
-      return false;
-    }
+    const decoded = this.decodificarToken(this.token);
+    const ahora = Math.floor(Date.now() / 1000);
+    return Boolean(decoded?.exp && decoded.exp > ahora);
   }
 }

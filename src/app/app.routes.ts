@@ -17,11 +17,13 @@ export const routes: Routes = [
     children: [
       {
         path: 'registrar-materias',
+        canActivate: [authGuard],
         loadComponent: () =>
           import('./pages/Materias/registro/registro.component'),
       },
       {
         path: 'companeros',
+        canActivate: [authGuard],
         loadComponent: () =>
           import('./pages/Materias/companeros/companeros.component'),
       },

@@ -5,6 +5,8 @@ import { TableModule } from 'primeng/table';
 import { CommonModule } from '@angular/common';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
+import { finalize } from 'rxjs';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-companeros',
@@ -14,15 +16,26 @@ import { ButtonModule } from 'primeng/button';
 })
 export default class CompanerosComponent implements OnInit {
   private estudianteService = inject(EstudianteService);
+  private toastService = inject(ToastService);
   materiasCompaneros: EstudianteMateria[] = [];
   loading: boolean = true;
 
   ngOnInit(): void {
-    this.estudianteService.getMateriasCompaneros().subscribe({
-      next: (response) => {
-        this.materiasCompaneros = response;
-        this.loading = false;
-      },
-    });
+    this.estudianteService
+      .getMateriasCompaneros()
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
+        next: (response) => {
+          this.materiasCompaneros = response;
+        },
+        error: () => {
+          this.toastService.showMessage(
+            'error',
+            3000,
+            'Error',
+            'No fue posible cargar la lista de compañeros.'
+          );
+        },
+      });
   }
 }

@@ -2,9 +2,11 @@ import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { catchError, throwError } from 'rxjs';
+import { AuthService } from '../services/auth.service';
 
 export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
-  const token = localStorage.getItem('token');
+  const auth = inject(AuthService);
+  const token = auth.token;
   const messageService = inject(MessageService);
 
   let clonedReq = req;
@@ -20,7 +22,15 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
   return next(clonedReq).pipe(
     catchError((error: HttpErrorResponse) => {
       console.error('Error en la solicitud:', error);
-      if (error.status === 404) {
+      if (error.status === 401 || error.status === 403) {
+        auth.limpiarSesion();
+        messageService.add({
+          severity: 'warn',
+          summary: 'Sesión expirada',
+          detail: 'Inicia sesión nuevamente para continuar.',
+          life: 5000,
+        });
+      } else if (error.status === 404) {
         messageService.add({
           severity: 'error',
           summary: 'Error 404',

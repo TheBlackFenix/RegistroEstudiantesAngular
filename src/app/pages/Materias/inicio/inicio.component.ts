@@ -6,6 +6,8 @@ import { MessageModule } from 'primeng/message';
 import { EstudianteService } from '../../../core/services/estudiante.service';
 import { Materia } from '../../../core/models/estudiante';
 import { filter, Subscription } from 'rxjs';
+import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 @Component({
   selector: 'app-inicio',
   standalone: true,
@@ -15,9 +17,11 @@ import { filter, Subscription } from 'rxjs';
 export default class InicioComponent implements OnInit, OnDestroy {
   private routerSub!: Subscription;
   items: MenuItem[] | undefined;
-  materiasInsritas: Materia[] = [];
+  materiasInscritas: Materia[] = [];
   private router = inject(Router);
   private estudianteService = inject(EstudianteService);
+  private login = inject(AuthService);
+  private toastService = inject(ToastService);
   ngOnInit(): void {
     this.items = [
       {
@@ -34,6 +38,13 @@ export default class InicioComponent implements OnInit, OnDestroy {
           this.router.navigate(['/inicio/registrar-materias']);
         },
       },
+      {
+        label: 'Cerrar Sesión',
+        icon: 'pi pi-sign-out',
+        command: () => {
+          this.cerrarSesion();
+        },
+      },
     ];
     this.obtenerMateriasInscritas();
     // Suscribirse a los eventos de navegación del router
@@ -41,11 +52,8 @@ export default class InicioComponent implements OnInit, OnDestroy {
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event) => {
         // Detecta si estás de nuevo en /inicio exactamente
-        if (
-          this.router.url.startsWith('/inicio') ||
-          this.router.url == '/inicio'
-        ) {
-          this.obtenerMateriasInscritas(); // vuelve a hacer la petición
+        if (this.router.url.startsWith('/inicio')) {
+          this.obtenerMateriasInscritas();
         }
       });
   }
@@ -53,11 +61,22 @@ export default class InicioComponent implements OnInit, OnDestroy {
   obtenerMateriasInscritas() {
     this.estudianteService.materiasInscritas().subscribe({
       next: (response) => {
-        console.log('Materias inscritas:', response);
-        this.materiasInsritas = response;
-        this.estudianteService.setNroInscritas(this.materiasInsritas.length);
+        this.materiasInscritas = response;
+        this.estudianteService.setNroInscritas(this.materiasInscritas.length);
+      },
+      error: () => {
+        this.toastService.showMessage(
+          'error',
+          3000,
+          'Error',
+          'No fue posible cargar tus materias inscritas.'
+        );
       },
     });
+  }
+  cerrarSesion() {
+    this.login.logout();
+    this.router.navigate(['/login']);
   }
   ngOnDestroy(): void {
     this.routerSub.unsubscribe();

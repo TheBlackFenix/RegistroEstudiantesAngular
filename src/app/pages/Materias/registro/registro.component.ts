@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { MessageModule } from 'primeng/message';
 import { TableModule } from 'primeng/table';
+import { finalize } from 'rxjs';
 import { MateriaProfesor } from '../../../core/models/estudiante';
 import { EstudianteService } from '../../../core/services/estudiante.service';
 import { ToastService } from './../../../core/services/toast.service';
@@ -27,10 +28,16 @@ export default class RegistroComponent implements OnInit {
   private estudianteService = inject(EstudianteService);
   materiasDisponibles: MateriaProfesor[] = [];
   materiasSeleccionadas: number[] = [];
+  cargando = false;
   private router = inject(Router);
-  readonly maxMaterias = 3 - this.estudianteService.getNroInscritas();
   toastService = inject(ToastService);
+
+  get maxMaterias(): number {
+    return Math.max(0, 3 - this.estudianteService.getNroInscritas());
+  }
+
   ngOnInit(): void {
+    this.cargando = true;
     this.estudianteService.ObtenerMateriasDisponibles().subscribe({
       next: (response) => {
         this.materiasDisponibles = response.map((materia) => ({
@@ -38,6 +45,18 @@ export default class RegistroComponent implements OnInit {
           seleccionada: false,
           deshabilitada: false,
         }));
+      },
+      error: () => {
+        this.toastService.showMessage(
+          'error',
+          3000,
+          'Error',
+          'No fue posible cargar las materias disponibles.'
+        );
+        this.cargando = false;
+      },
+      complete: () => {
+        this.cargando = false;
       },
     });
   }
@@ -68,16 +87,12 @@ export default class RegistroComponent implements OnInit {
     return profesorYaSeleccionado;
   }
 
-  onMateriaSeleccionada(materia: MateriaProfesor, evento: any): void {
-    const isChecked = evento.checked;
-
+  onMateriaSeleccionada(materia: MateriaProfesor, isChecked: boolean): void {
     if (isChecked) {
-      // Agregar materia si no está en el límite
       if (this.materiasSeleccionadas.length < this.maxMaterias) {
         this.materiasSeleccionadas.push(materia.idMateria);
       }
     } else {
-      // Remover materia
       const index = this.materiasSeleccionadas.indexOf(materia.idMateria);
       if (index > -1) {
         this.materiasSeleccionadas.splice(index, 1);
@@ -99,8 +114,10 @@ export default class RegistroComponent implements OnInit {
       );
       return;
     }
+    this.cargando = true;
     this.estudianteService
       .RegistrarMateriasSeleccionadas(this.materiasSeleccionadas)
+      .pipe(finalize(() => (this.cargando = false)))
       .subscribe({
         next: (response: { message: string }) => {
           this.toastService.showMessage(
@@ -110,6 +127,14 @@ export default class RegistroComponent implements OnInit {
             'Materias registradas correctamente.'
           );
           this.router.navigate(['/inicio']);
+        },
+        error: () => {
+          this.toastService.showMessage(
+            'error',
+            3000,
+            'Error',
+            'No fue posible registrar las materias seleccionadas.'
+          );
         },
       });
   }

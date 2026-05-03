@@ -1,8 +1,8 @@
-<div class="h-screen flex items-center justify-center bg-gray-100">
+<div class="min-h-screen flex items-center justify-center bg-gray-100 p-4">
   <form
     [formGroup]="form"
     (ngSubmit)="login()"
-    class="bg-white p-6 rounded-lg shadow max-w-sm space-y-5 w-1/3 items-center justify-center"
+    class="bg-white p-6 rounded-lg shadow max-w-sm space-y-5 w-full items-center justify-center"
   >
     <h2 class="text-xl font-semibold text-center text-gray-700">
       Iniciar sesión
@@ -34,6 +34,7 @@
       type="submit"
       label="Ingresar"
       [disabled]="form.invalid || cargando"
+      [loading]="cargando"
       class="w-full"
     ></button>
 

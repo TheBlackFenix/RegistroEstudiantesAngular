@@ -7,6 +7,7 @@ import { LoginDto } from '../../../core/models/auth';
 import { AuthService } from '../../../core/services/auth.service';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ToastService } from '../../../core/services/toast.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -44,21 +45,22 @@ export default class LoginComponent {
       idEstudiante: this.form.value.idEstudiante!,
       clave: this.form.value.clave!,
     };
-    this.auth.login(loginDto).subscribe({
-      next: (res) => {
-        this.cargando = false;
-        this.auth.guardarToken(res.token);
-        this.router.navigate(['/inicio']);
-      },
-      error: () => {
-        this.cargando = false;
-        this.toastService.showMessage(
-          'error',
-          3000,
-          'Error',
-          'Credenciales incorrectas'
-        );
-      },
-    });
+    this.auth
+      .login(loginDto)
+      .pipe(finalize(() => (this.cargando = false)))
+      .subscribe({
+        next: (res) => {
+          this.auth.guardarToken(res.token);
+          this.router.navigate(['/inicio']);
+        },
+        error: () => {
+          this.toastService.showMessage(
+            'error',
+            3000,
+            'Error',
+            'Credenciales incorrectas'
+          );
+        },
+      });
   }
 }
