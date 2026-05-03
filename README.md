@@ -1,27 +1,82 @@
-# RegistroEstudiantesAngular
+# Registro de Estudiantes
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.20.
+Aplicación web para que un estudiante pueda registrarse, iniciar sesión y seleccionar sus materias. También permite consultar las materias inscritas y ver compañeros asociados a las mismas.
 
-## Development server
+## Funcionalidades principales
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- Registro e inicio de sesión de estudiantes.
+- Validación de sesión mediante token.
+- Consulta de materias inscritas.
+- Registro de materias disponibles.
+- Restricción de máximo 3 materias por estudiante.
+- Validación para no seleccionar varias materias con el mismo profesor.
+- Consulta de compañeros y sus materias.
+- Mensajes de confirmación y error para mejorar la experiencia de uso.
 
-## Code scaffolding
+## Tecnologías usadas
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+- Angular 18
+- PrimeNG
+- Tailwind CSS
+- RxJS
+- JWT para autenticación
 
-## Build
+## Requisitos
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Antes de ejecutar el proyecto, asegúrate de tener instalado:
 
-## Running unit tests
+- Node.js
+- Angular CLI
+- Backend de la aplicación ejecutándose
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Configuración del backend
 
-## Running end-to-end tests
+La URL base de la API se configura en:
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+- `src/environments/environment.ts`
+- `src/environments/environment.prod.ts`
 
-## Further help
+Por defecto está configurada así:
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+```ts
+apiUrl: 'https://localhost:7129/api'
+```
+
+Si el backend corre en otro puerto o dominio, cambia ese valor.
+
+## Instalación
+
+```bash
+npm install
+```
+
+## Ejecutar en desarrollo
+
+```bash
+npm start
+```
+
+Luego abre:
+
+```text
+http://localhost:4200
+```
+
+## Generar build
+
+```bash
+npm run build
+```
+
+El resultado se genera en la carpeta `dist/`.
+
+## Estructura general
+
+- `src/app/core`: servicios, modelos, guard e interceptor.
+- `src/app/pages/Auth`: pantallas de login y registro.
+- `src/app/pages/Materias`: pantallas relacionadas con materias y compañeros.
+- `src/environments`: configuración de ambientes.
+
+## Nota
+
+Para que la aplicación funcione correctamente, el backend debe estar disponible y aceptar las rutas configuradas para autenticación, materias y compañeros.
